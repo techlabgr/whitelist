@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - claude/material-todo-app-ZSAQs
+    paths:
+      - 'index.html'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+env:
+  RELEASE_TAG: ${{ github.event.inputs.tag || 'v1.0.0' }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare download asset
+        run: cp index.html todo-app.html
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: To Do App ${{ env.RELEASE_TAG }}
+          make_latest: true
+          body: |
+            ## Material Design 3 To Do List
+
+            A fully self-contained To Do List web app — a single HTML file with no
+            external frameworks or build step.
+
+            ### How to use
+            1. Download **`todo-app.html`** below.
+            2. Double-click it (or open it in any modern browser).
+
+            Tasks are saved in your browser via `localStorage`.
+
+            ### Features
+            - Add / complete / delete tasks with smooth animations
+            - All / Active / Completed filters and a live task counter
+            - localStorage persistence and an empty-state view
+            - Google Blue Material 3 styling, ripple effects, mobile FAB
+          files: |
+            todo-app.html
+            index.html
